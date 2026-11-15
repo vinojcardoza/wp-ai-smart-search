@@ -38,16 +38,16 @@ class Reindex_Page {
 		$model   = (string) get_option( Embeddings::MODEL_OPTION, '' );
 		$stats   = ( new Index_Repository() )->stats();
 		$job     = ( new Reindexer() )->status();
-		$running = 'running' === $job['status'];
+		$running = $job['status'] === 'running';
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flag set by our own redirect.
 		$notice = isset( $_GET['wpaismse'] ) ? sanitize_key( wp_unslash( $_GET['wpaismse'] ) ) : '';
 
 		Layout::open( Layout::REINDEX_PAGE, __( 'Re-Index', 'wpaismse' ) );
 		?>
-		<?php if ( 'started' === $notice ) : ?>
+		<?php if ( $notice === 'started' ) : ?>
 			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Re-index started. You can leave this page; it continues in the background.', 'wpaismse' ); ?></p></div>
-		<?php elseif ( 'no-endpoint' === $notice ) : ?>
+		<?php elseif ( $notice === 'no-endpoint' ) : ?>
 			<div class="notice notice-error is-dismissible">
 				<p>
 					<?php esc_html_e( 'Set the embedding endpoint URL before re-indexing.', 'wpaismse' ); ?>
@@ -111,7 +111,7 @@ class Reindex_Page {
 						</div>
 						<div>
 							<dt><?php esc_html_e( 'Model', 'wpaismse' ); ?></dt>
-							<dd><?php echo esc_html( '' !== $model ? $model : '—' ); ?></dd>
+							<dd><?php echo esc_html( $model !== '' ? $model : '—' ); ?></dd>
 						</div>
 						<div>
 							<dt><?php esc_html_e( 'Dimensions', 'wpaismse' ); ?></dt>
@@ -175,7 +175,7 @@ class Reindex_Page {
 		$html  = '<span class="wpaismse-badge wpaismse-badge--' . esc_attr( (string) $state['status'] ) . ( $state['failed'] > 0 ? ' wpaismse-badge--errors' : '' ) . '">' . esc_html( $badge ) . '</span>';
 		$html .= '<p class="wpaismse-reindex__headline">' . esc_html( $headline ) . '</p>';
 
-		if ( 'idle' !== $state['status'] ) {
+		if ( $state['status'] !== 'idle' ) {
 			$html .= '<div class="wpaismse-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . esc_attr( (string) $percent ) . '">'
 				. '<span style="width:' . esc_attr( (string) $percent ) . '%"></span></div>';
 
@@ -186,7 +186,7 @@ class Reindex_Page {
 			$html .= '<ul class="wpaismse-counts">' . implode( '', $items ) . '</ul>';
 		}
 
-		if ( '' !== $state['last_error'] ) {
+		if ( $state['last_error'] !== '' ) {
 			$html .= '<p class="wpaismse-reindex__error">' . esc_html( $state['last_error'] ) . '</p>';
 		}
 

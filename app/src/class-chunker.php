@@ -67,7 +67,7 @@ final class Chunker {
 
 		$words = preg_split( '/[\s\p{Z}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY );
 
-		if ( false === $words ) {
+		if ( $words === false ) {
 			throw new InvalidArgumentException( 'Text is not valid UTF-8.' );
 		}
 

@@ -70,7 +70,7 @@ class Index_Repository {
 			)
 		);
 
-		return null === $hash ? null : (string) $hash;
+		return $hash === null ? null : (string) $hash;
 	}
 
 	/**
@@ -192,7 +192,7 @@ class Index_Repository {
 
 		$post_types = array_values( array_filter( array_map( 'strval', $post_types ) ) );
 
-		if ( array() === $post_types ) {
+		if ( $post_types === array() ) {
 			return 0;
 		}
 
@@ -242,7 +242,7 @@ class Index_Repository {
 		$stats = array(
 			'posts'        => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $tables['documents'] ) ),
 			'chunks'       => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $tables['chunks'] ) ),
-			'last_indexed' => null === $last ? null : (string) $last,
+			'last_indexed' => $last === null ? null : (string) $last,
 		);
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
@@ -373,7 +373,7 @@ class Index_Repository {
 
 		$chunk_ids = array_values( array_unique( array_filter( array_map( 'intval', $chunk_ids ) ) ) );
 
-		if ( array() === $chunk_ids ) {
+		if ( $chunk_ids === array() ) {
 			return array();
 		}
 
@@ -408,7 +408,7 @@ class Index_Repository {
 	private function check( int|bool $result ): void {
 		global $wpdb;
 
-		if ( false === $result ) {
+		if ( $result === false ) {
 			throw new RuntimeException( 'Index database error: ' . $wpdb->last_error );
 		}
 	}

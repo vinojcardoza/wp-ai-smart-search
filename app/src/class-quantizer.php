@@ -107,7 +107,7 @@ final class Quantizer {
 
 		$values = unpack( 'c*', $blob );
 
-		if ( false === $values ) {
+		if ( $values === false ) {
 			return array();
 		}
 
@@ -141,11 +141,11 @@ final class Quantizer {
 	 */
 	private static function validate( array $vector, ?int $dimensions ): void {
 
-		if ( array() === $vector ) {
+		if ( $vector === array() ) {
 			throw new InvalidArgumentException( 'Embedding vector is empty.' );
 		}
 
-		if ( null !== $dimensions && count( $vector ) !== $dimensions ) {
+		if ( $dimensions !== null && count( $vector ) !== $dimensions ) {
 			throw new InvalidArgumentException(
 				sprintf( 'Expected %d embedding dimensions, got %d.', $dimensions, count( $vector ) )
 			);

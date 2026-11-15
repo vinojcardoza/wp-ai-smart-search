@@ -46,18 +46,49 @@ on the Plugins screen) and fill in:
 
 | Field        | Description                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------- |
-| Endpoint URL | Embedding endpoint URL, http or https (required).                                        |
+| Endpoint URL | OpenAI-compatible embeddings URL, http or https (required), e.g. `https://openrouter.ai/api/v1/embeddings`. |
 | API key      | Optional. Sent as `Authorization: Bearer <key>` only when set.                           |
-| Model        | Model name, stored with each chunk. Changing it re-embeds posts on their next index run. |
+| Model        | Model name, sent with each request (when set) and stored with each chunk. Changing it re-embeds posts on their next index run. |
 
 The values are stored in the options `wpaismse_embedding_endpoint`,
 `wpaismse_embedding_api_key` and `wpaismse_embedding_model`, so they can also
 be set with WP-CLI:
 
 ```sh
-wp option update wpaismse_embedding_endpoint https://embeddings.example.com/embed
+wp option update wpaismse_embedding_endpoint https://embeddings.example.com/v1/embeddings
 wp option update wpaismse_embedding_model all-MiniLM-L6-v2
 wp option update wpaismse_embedding_api_key your-key   # optional
+```
+
+### Embedding request format
+
+The plugin uses the OpenAI-compatible embeddings format, so OpenAI,
+OpenRouter, Ollama, LM Studio and similar services work without an adapter.
+Up to 16 texts are sent per request:
+
+```
+POST {"model": "all-MiniLM-L6-v2", "input": ["…", "…"]}
+→ {"data": [{"index": 0, "embedding": […]}, {"index": 1, "embedding": […]}]}
+```
+
+- `model` is only sent when the Model option is set.
+- Vectors are matched to texts by `index`, so the response order doesn't matter.
+- A legacy `{"embeddings": [[…], […]]}` response is still accepted.
+- When the service returns an error (`{"error": {"message": "…"}}` or
+  `{"error": "…"}`), its message is included in the logged error.
+- Vectors must currently have 384 dimensions (see
+  [Embedding dimensions](#embedding-dimensions)).
+
+The bundled Python service in `python-api/` (sentence-transformers,
+`all-MiniLM-L6-v2`) serves this format at `POST /v1/embeddings`:
+
+```sh
+cd python-api
+python3 -m venv .venv && . .venv/bin/activate
+python3 -m pip install -r requirements.txt
+uvicorn app:app --host 127.0.0.1 --port 1168
+# Endpoint URL: http://127.0.0.1:1168/v1/embeddings
+# (from the Docker stack: http://host.docker.internal:1168/v1/embeddings)
 ```
 
 ## AI answers (chat model)

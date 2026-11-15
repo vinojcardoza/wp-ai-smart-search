@@ -76,13 +76,13 @@ class Settings_Page {
 	public function sanitize_endpoint( $value ): string {
 		$value = trim( (string) $value );
 
-		if ( '' === $value ) {
+		if ( $value === '' ) {
 			return '';
 		}
 
 		$url = esc_url_raw( $value, array( 'http', 'https' ) );
 
-		if ( '' === $url ) {
+		if ( $url === '' ) {
 			function_exists( 'add_settings_error' ) && add_settings_error(
 				Embeddings::ENDPOINT_OPTION,
 				'invalid_endpoint',
@@ -166,9 +166,9 @@ class Settings_Page {
 			<aside class="wpaismse-col">
 				<section class="wpaismse-card wpaismse-card--aside">
 					<h2 class="wpaismse-card__title"><?php esc_html_e( 'Request format', 'wpaismse' ); ?></h2>
-					<pre class="wpaismse-code">POST {"texts": ["…", "…"]}
-→ {"embeddings": [[…], […]]}</pre>
-					<p class="wpaismse-note"><?php esc_html_e( 'Up to 16 texts per request, one vector per text in the same order.', 'wpaismse' ); ?></p>
+					<pre class="wpaismse-code">POST {"model": "…", "input": ["…", "…"]}
+→ {"data": [{"index": 0, "embedding": […]}, …]}</pre>
+					<p class="wpaismse-note"><?php esc_html_e( 'OpenAI-compatible embeddings format (OpenAI, OpenRouter, Ollama, LM Studio). Up to 16 texts per request, one vector per text.', 'wpaismse' ); ?></p>
 				</section>
 			</aside>
 		</div>

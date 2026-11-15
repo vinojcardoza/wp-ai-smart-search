@@ -92,13 +92,13 @@ class Search_Integration {
 
 		// Leave post-type-specific searches (e.g. ?post_type=product) to their owners.
 		$post_type = $query->get( 'post_type' );
-		if ( ! empty( $post_type ) && 'any' !== $post_type ) {
+		if ( ! empty( $post_type ) && $post_type !== 'any' ) {
 			return;
 		}
 
 		$text = Search_Service::normalize_query( $query->get( 's' ) );
 
-		if ( ! Search_Service::is_valid_query( $text ) || array() === Indexer::post_types() ) {
+		if ( ! Search_Service::is_valid_query( $text ) || Indexer::post_types() === array() ) {
 			return;
 		}
 
@@ -111,7 +111,7 @@ class Search_Integration {
 		}
 
 		// Nothing found: let WordPress's own search have a go.
-		if ( array() === $results ) {
+		if ( $results === array() ) {
 			return;
 		}
 

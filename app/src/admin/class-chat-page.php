@@ -88,13 +88,13 @@ class Chat_Page {
 	public function sanitize_endpoint( $value ): string {
 		$value = trim( (string) $value );
 
-		if ( '' === $value ) {
+		if ( $value === '' ) {
 			return '';
 		}
 
 		$url = esc_url_raw( $value, array( 'http', 'https' ) );
 
-		if ( '' === $url ) {
+		if ( $url === '' ) {
 			function_exists( 'add_settings_error' ) && add_settings_error(
 				Chat::ENDPOINT_OPTION,
 				'invalid_chat_endpoint',
@@ -129,7 +129,7 @@ class Chat_Page {
 			return '';
 		}
 
-		if ( '' !== $prompt && ! str_contains( $prompt, '{results}' ) ) {
+		if ( $prompt !== '' && ! str_contains( $prompt, '{results}' ) ) {
 			function_exists( 'add_settings_error' ) && add_settings_error(
 				Chat::PROMPT_OPTION,
 				'prompt_without_results',
@@ -158,10 +158,10 @@ class Chat_Page {
 
 		// Warnings (e.g. a prompt without {results}) still count as saved; only errors don't.
 		$messages = get_settings_errors();
-		$blocking = array_filter( $messages, fn( array $message ): bool => 'error' === $message['type'] || 'settings_updated' === $message['code'] );
+		$blocking = array_filter( $messages, fn( array $message ): bool => $message['type'] === 'error' || $message['code'] === 'settings_updated' );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only flag set by options.php's redirect.
-		if ( isset( $_GET['settings-updated'] ) && array() === $blocking ) {
+		if ( isset( $_GET['settings-updated'] ) && $blocking === array() ) {
 			add_settings_error( 'general', 'settings_updated', __( 'Settings saved.', 'wpaismse' ), 'success' );
 		}
 
@@ -283,14 +283,14 @@ class Chat_Page {
 	private function sample_results(): array {
 		static $results = null;
 
-		if ( null !== $results ) {
+		if ( $results !== null ) {
 			return $results;
 		}
 
 		$post_types = Indexer::post_types();
 		$results    = array();
 
-		if ( array() === $post_types ) {
+		if ( $post_types === array() ) {
 			return $results;
 		}
 

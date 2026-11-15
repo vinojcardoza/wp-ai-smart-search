@@ -129,8 +129,8 @@ class Indexer {
 	 * @return bool
 	 */
 	public static function is_indexable( WP_Post $post ): bool {
-		return 'publish' === $post->post_status
-			&& '' === $post->post_password
+		return $post->post_status === 'publish'
+			&& $post->post_password === ''
 			&& in_array( $post->post_type, self::post_types(), true )
 			&& ! self::is_excluded( $post->ID );
 	}

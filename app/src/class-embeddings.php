@@ -97,9 +97,12 @@ class Embeddings {
 	/**
 	 * Generate vector embeddings for a batch of texts via the embedding API.
 	 *
-	 * Sends the texts as a JSON payload ({"texts": [...]}) to the endpoint.
-	 * The API key is sent as "Authorization: Bearer <key>" only when it is
-	 * not empty.
+	 * Uses the OpenAI-compatible embeddings format (OpenAI, OpenRouter, Ollama,
+	 * LM Studio, ...): sends {"model": "...", "input": [...]} and reads
+	 * {"data": [{"index": 0, "embedding": [...]}, ...]}, ordered by "index".
+	 * A legacy {"embeddings": [[...], ...]} response is also accepted. The
+	 * model is only sent when set, and the API key is sent as
+	 * "Authorization: Bearer <key>" only when it is not empty.
 	 *
 	 * @param string[] $texts List of texts to embed.
 	 *
@@ -112,18 +115,24 @@ class Embeddings {
 	 */
 	public function generate_embeddings( array $texts ): array {
 
-		if ( array() === $texts ) {
+		if ( $texts === array() ) {
 			return array();
 		}
 
-		if ( '' === $this->endpoint ) {
+		if ( $this->endpoint === '' ) {
 			throw new Exception( 'Embedding endpoint is not set (option wpaismse_embedding_endpoint).' );
 		}
 
 		$headers = array( 'Content-Type' => 'application/json' );
 
-		if ( '' !== $this->api_key ) {
+		if ( $this->api_key !== '' ) {
 			$headers['Authorization'] = 'Bearer ' . $this->api_key;
+		}
+
+		$body = array( 'input' => array_values( $texts ) );
+
+		if ( $this->model !== '' ) {
+			$body['model'] = $this->model;
 		}
 
 		$response = wp_remote_post(
@@ -131,7 +140,7 @@ class Embeddings {
 			array(
 				'timeout' => 90,
 				'headers' => $headers,
-				'body'    => wp_json_encode( array( 'texts' => array_values( $texts ) ) ),
+				'body'    => wp_json_encode( $body ),
 			)
 		);
 
@@ -140,18 +149,13 @@ class Embeddings {
 		}
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
-
-		if ( $code < 200 || $code >= 300 ) {
-			throw new Exception( 'Embedding endpoint returned HTTP ' . $code );
-		}
-
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( ! is_array( $data ) || ! isset( $data['embeddings'] ) || ! is_array( $data['embeddings'] ) ) {
-			throw new Exception( 'Invalid embedding response: missing embeddings array.' );
+		if ( $code < 200 || $code >= 300 ) {
+			throw new Exception( 'Embedding endpoint returned HTTP ' . $code . self::error_detail( $data ) );
 		}
 
-		$embeddings = array_values( $data['embeddings'] );
+		$embeddings = self::extract_embeddings( $data );
 
 		if ( count( $embeddings ) !== count( $texts ) ) {
 			throw new Exception(
@@ -164,7 +168,7 @@ class Embeddings {
 		}
 
 		foreach ( $embeddings as $index => $embedding ) {
-			if ( ! is_array( $embedding ) || array() === $embedding ) {
+			if ( ! is_array( $embedding ) || $embedding === array() ) {
 				throw new Exception(
 					sprintf( 'Invalid embedding response: embedding %d is not a non-empty array.', $index )
 				);
@@ -172,5 +176,79 @@ class Embeddings {
 		}
 
 		return $embeddings;
+	}
+
+	/**
+	 * Pull the vectors out of a decoded embedding response.
+	 *
+	 * OpenAI-compatible responses ({"data": [{"index", "embedding"}]}) are
+	 * sorted by "index" (falling back to array position); a legacy
+	 * {"embeddings": [...]} list is returned as is.
+	 *
+	 * @param mixed $data Decoded JSON response body.
+	 *
+	 * @return array List of vectors in input order (not yet validated).
+	 *
+	 * @throws Exception If the response has neither format.
+	 */
+	private static function extract_embeddings( mixed $data ): array {
+
+		if ( is_array( $data ) && isset( $data['data'] ) && is_array( $data['data'] ) ) {
+			$embeddings = array();
+
+			foreach ( array_values( $data['data'] ) as $position => $item ) {
+				if ( ! is_array( $item ) || ! isset( $item['embedding'] ) ) {
+					throw new Exception(
+						sprintf( 'Invalid embedding response: data item %d has no embedding.', $position )
+					);
+				}
+
+				$index = isset( $item['index'] ) && is_int( $item['index'] ) ? $item['index'] : $position;
+
+				if ( isset( $embeddings[ $index ] ) ) {
+					throw new Exception(
+						sprintf( 'Invalid embedding response: duplicate index %d.', $index )
+					);
+				}
+
+				$embeddings[ $index ] = $item['embedding'];
+			}
+
+			ksort( $embeddings );
+
+			return array_values( $embeddings );
+		}
+
+		if ( is_array( $data ) && isset( $data['embeddings'] ) && is_array( $data['embeddings'] ) ) {
+			return array_values( $data['embeddings'] );
+		}
+
+		throw new Exception( 'Invalid embedding response: missing data array' . self::error_detail( $data ) );
+	}
+
+	/**
+	 * Format the provider's error message, if the response carries one.
+	 *
+	 * Handles {"error": {"message": "..."}} (OpenAI, OpenRouter) and
+	 * {"error": "..."}. Truncated to 200 characters.
+	 *
+	 * @param mixed $data Decoded JSON response body.
+	 *
+	 * @return string ": <message>", or an empty string.
+	 */
+	private static function error_detail( mixed $data ): string {
+
+		if ( ! is_array( $data ) || ! isset( $data['error'] ) ) {
+			return '';
+		}
+
+		$error   = $data['error'];
+		$message = is_array( $error ) ? ( $error['message'] ?? '' ) : $error;
+
+		if ( ! is_string( $message ) || $message === '' ) {
+			return '';
+		}
+
+		return ': ' . mb_substr( $message, 0, 200 );
 	}
 }

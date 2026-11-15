@@ -91,13 +91,13 @@ class Chat_Client {
 	 *                   or the response has no answer.
 	 */
 	public function answer( string $query, array $results ): string {
-		if ( '' === $this->endpoint || '' === $this->model ) {
+		if ( $this->endpoint === '' || $this->model === '' ) {
 			throw new Exception( 'Chat model is not configured (endpoint and model are required).' );
 		}
 
 		$headers = array( 'Content-Type' => 'application/json' );
 
-		if ( '' !== $this->api_key ) {
+		if ( $this->api_key !== '' ) {
 			$headers['Authorization'] = 'Bearer ' . $this->api_key;
 		}
 
@@ -144,7 +144,7 @@ class Chat_Client {
 
 		$answer = self::clean( $content );
 
-		if ( '' === $answer ) {
+		if ( $answer === '' ) {
 			throw new Exception( 'The chat model returned an empty answer.' );
 		}
 

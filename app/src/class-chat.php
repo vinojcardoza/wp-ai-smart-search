@@ -68,7 +68,7 @@ final class Chat {
 	 * @return bool
 	 */
 	public static function is_configured(): bool {
-		return '' !== self::option( self::ENDPOINT_OPTION ) && '' !== self::option( self::MODEL_OPTION );
+		return self::option( self::ENDPOINT_OPTION ) !== '' && self::option( self::MODEL_OPTION ) !== '';
 	}
 
 	/**
@@ -79,7 +79,7 @@ final class Chat {
 	public static function prompt(): string {
 		$prompt = self::option( self::PROMPT_OPTION );
 
-		return '' !== $prompt ? $prompt : self::DEFAULT_PROMPT;
+		return $prompt !== '' ? $prompt : self::DEFAULT_PROMPT;
 	}
 
 	/**
@@ -130,7 +130,7 @@ final class Chat {
 					trim( (string) ( $result['url'] ?? '' ) ),
 					trim( (string) ( $result['excerpt'] ?? '' ) ),
 				),
-				fn( string $line ): bool => '' !== $line
+				fn( string $line ): bool => $line !== ''
 			);
 
 			$blocks[] = implode( "\n", $lines );

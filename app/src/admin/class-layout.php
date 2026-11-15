@@ -112,12 +112,12 @@ final class Layout {
 					<?php endforeach; ?>
 				</nav>
 				<div class="wpaismse-bar__end">
-					<?php if ( '' !== $endpoint ) : ?>
+					<?php if ( $endpoint !== '' ) : ?>
 						<span class="wpaismse-status wpaismse-status--ok"><?php esc_html_e( 'Embedding service configured', 'wpaismse' ); ?></span>
 					<?php else : ?>
 						<span class="wpaismse-status"><?php esc_html_e( 'Embedding endpoint not set', 'wpaismse' ); ?></span>
 					<?php endif; ?>
-					<?php if ( '' !== $version ) : ?>
+					<?php if ( $version !== '' ) : ?>
 						<span class="wpaismse-tag">v<?php echo esc_html( $version ); ?></span>
 					<?php endif; ?>
 				</div>
@@ -174,13 +174,13 @@ final class Layout {
 	 * @return string "—" when null.
 	 */
 	public static function time_ago( ?string $gmt_datetime ): string {
-		if ( null === $gmt_datetime ) {
+		if ( $gmt_datetime === null ) {
 			return '—';
 		}
 
 		$timestamp = strtotime( $gmt_datetime . ' UTC' );
 
-		if ( false === $timestamp ) {
+		if ( $timestamp === false ) {
 			return '—';
 		}
 

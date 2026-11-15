@@ -67,7 +67,7 @@ class Post_Types_Page {
 		$before = get_option( Indexer::POST_TYPES_OPTION, Indexer::DEFAULT_POST_TYPES );
 		$added  = array_diff( $types, is_array( $before ) ? $before : Indexer::DEFAULT_POST_TYPES );
 
-		if ( ! $noticed && array() !== $added && function_exists( 'add_settings_error' ) ) {
+		if ( ! $noticed && $added !== array() && function_exists( 'add_settings_error' ) ) {
 			$noticed = true;
 			$labels  = array_map( fn( string $name ): string => self::available()[ $name ]->labels->name, $added );
 

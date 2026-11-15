@@ -191,7 +191,7 @@ class Rest_Api {
 			);
 		}
 
-		if ( array() === $results ) {
+		if ( $results === array() ) {
 			return new WP_REST_Response(
 				array(
 					'query'       => $query,

@@ -126,7 +126,7 @@ class Searcher {
 	public function search( string $query, int $limit = 10 ): array {
 		$query = trim( $query );
 
-		if ( '' === $query || $limit < 1 ) {
+		if ( $query === '' || $limit < 1 ) {
 			return array(
 				'results'      => array(),
 				'keyword_only' => false,
@@ -222,7 +222,7 @@ class Searcher {
 				$after_id = $row['id'];
 				$values   = unpack( 'c*', $row['embedding'] );
 
-				if ( false === $values || count( $values ) !== Embeddings::DIMENSIONS ) {
+				if ( $values === false || count( $values ) !== Embeddings::DIMENSIONS ) {
 					continue;
 				}
 
@@ -236,7 +236,7 @@ class Searcher {
 					$length += $v * $v;
 				}
 
-				if ( 0 === $length ) {
+				if ( $length === 0 ) {
 					continue;
 				}
 
@@ -284,7 +284,7 @@ class Searcher {
 		foreach ( $ranked as $post_id => $score ) {
 			$post = get_post( $post_id );
 
-			if ( ! $post || 'publish' !== $post->post_status ) {
+			if ( ! $post || $post->post_status !== 'publish' ) {
 				continue;
 			}
 

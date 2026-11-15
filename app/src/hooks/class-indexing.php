@@ -82,7 +82,7 @@ class Indexing {
 	private function remove_disabled_types( array $before, $after ): void {
 		$disabled = array_diff( $before, is_array( $after ) ? $after : array() );
 
-		if ( array() === $disabled ) {
+		if ( $disabled === array() ) {
 			return;
 		}
 
@@ -115,7 +115,7 @@ class Indexing {
 
 		$args = array( $post_id );
 
-		if ( false === wp_next_scheduled( self::CRON_HOOK, $args ) ) {
+		if ( wp_next_scheduled( self::CRON_HOOK, $args ) === false ) {
 			wp_schedule_single_event( time(), self::CRON_HOOK, $args );
 		}
 	}

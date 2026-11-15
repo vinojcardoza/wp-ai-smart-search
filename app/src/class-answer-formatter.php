@@ -43,14 +43,14 @@ final class Answer_Formatter {
 		$items     = array();
 
 		$flush_paragraph = function () use ( &$html, &$paragraph ): void {
-			if ( array() !== $paragraph ) {
+			if ( $paragraph !== array() ) {
 				$html[]    = '<p>' . implode( '<br>', $paragraph ) . '</p>';
 				$paragraph = array();
 			}
 		};
 
 		$flush_list = function () use ( &$html, &$list_type, &$items ): void {
-			if ( '' !== $list_type ) {
+			if ( $list_type !== '' ) {
 				$html[]    = "<{$list_type}><li>" . implode( '</li><li>', $items ) . "</li></{$list_type}>";
 				$list_type = '';
 				$items     = array();
@@ -58,7 +58,7 @@ final class Answer_Formatter {
 		};
 
 		foreach ( $lines as $line ) {
-			if ( '' === trim( $line ) ) {
+			if ( trim( $line ) === '' ) {
 				// A blank line ends a paragraph; lists continue across blank lines.
 				$flush_paragraph();
 				continue;
@@ -66,14 +66,14 @@ final class Answer_Formatter {
 
 			if ( preg_match( '/^\s*[-*•]\s+(.*)$/u', $line, $match ) ) {
 				$flush_paragraph();
-				if ( 'ul' !== $list_type ) {
+				if ( $list_type !== 'ul' ) {
 					$flush_list();
 					$list_type = 'ul';
 				}
 				$items[] = self::inline( $match[1], $urls );
 			} elseif ( preg_match( '/^\s*\d+[.)]\s+(.*)$/u', $line, $match ) ) {
 				$flush_paragraph();
-				if ( 'ol' !== $list_type ) {
+				if ( $list_type !== 'ol' ) {
 					$flush_list();
 					$list_type = 'ol';
 				}

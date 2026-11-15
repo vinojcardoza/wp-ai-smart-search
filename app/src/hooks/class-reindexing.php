@@ -59,7 +59,7 @@ class Reindexing {
 
 		$result = 'started';
 
-		if ( '' === trim( (string) get_option( Embeddings::ENDPOINT_OPTION, '' ) ) ) {
+		if ( trim( (string) get_option( Embeddings::ENDPOINT_OPTION, '' ) ) === '' ) {
 			$result = 'no-endpoint';
 		} else {
 			( new Reindexer() )->start();
@@ -106,7 +106,7 @@ class Reindexing {
 		$reindexer = new Reindexer();
 		$state     = $reindexer->run_batch();
 
-		if ( 'running' === $state['status'] ) {
+		if ( $state['status'] === 'running' ) {
 			$reindexer->schedule_next();
 		}
 	}

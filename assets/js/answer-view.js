@@ -27,7 +27,7 @@ store( 'wpaismse/answer', {
 				const data = yield response.json();
 
 				if ( ! response.ok ) {
-					context.message = 429 === response.status ? context.messages.rateLimited : context.messages.error;
+					context.message = response.status === 429 ? context.messages.rateLimited : context.messages.error;
 				} else if ( ! data.answer ) {
 					// Nothing matched: hide the box instead of showing an empty answer.
 					context.dismissed = true;

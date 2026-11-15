@@ -120,7 +120,7 @@ class Reindexer {
 	 * @return bool
 	 */
 	public function is_running(): bool {
-		return 'running' === $this->status()['status'];
+		return $this->status()['status'] === 'running';
 	}
 
 	/**
@@ -176,7 +176,7 @@ class Reindexer {
 			wp_cache_delete( self::STATE_OPTION, 'options' );
 			$state = $this->status();
 
-			if ( 'running' !== $state['status'] ) {
+			if ( $state['status'] !== 'running' ) {
 				return $state;
 			}
 
@@ -216,7 +216,7 @@ class Reindexer {
 	 * @return void
 	 */
 	public function schedule_next(): void {
-		if ( false === wp_next_scheduled( self::CRON_HOOK ) ) {
+		if ( wp_next_scheduled( self::CRON_HOOK ) === false ) {
 			wp_schedule_single_event( time(), self::CRON_HOOK );
 		}
 	}
@@ -265,7 +265,7 @@ class Reindexer {
 	private function post_type_placeholders(): array {
 		$types = array_values( array_map( 'strval', Indexer::post_types() ) );
 
-		if ( array() === $types ) {
+		if ( $types === array() ) {
 			// No indexable types: match nothing.
 			$types = array( '' );
 		}
