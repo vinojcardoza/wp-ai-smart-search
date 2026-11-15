@@ -5,8 +5,9 @@ chunks, turned into vector embeddings by an external embedding service, and
 stored in MySQL as compact INT8 vectors alongside a FULLTEXT keyword index.
 No vector database is needed, so it runs on ordinary shared hosting.
 
-> **Status:** indexing is implemented; the search side (keyword + semantic
-> ranking) is in progress.
+Searches combine keyword and semantic ranking, can replace your theme's
+built-in search, and can show an AI-written answer (with linked sources)
+above the results.
 
 ## Requirements
 
@@ -29,9 +30,14 @@ No vector database is needed, so it runs on ordinary shared hosting.
     Trashed, deleted, unpublished and password-protected posts are removed from
     the index.
 
-2. **Search** (planned). A MySQL FULLTEXT keyword search and a vector
-   similarity scan each return their best matches, which are combined with
-   Reciprocal Rank Fusion.
+2. **Search.** A MySQL FULLTEXT keyword search and a vector similarity scan
+   each return their best-matching post (weak semantic matches are dropped),
+   and the two lists are combined with weighted Reciprocal Rank Fusion
+   (semantic 1.0, keyword 0.8). If the embedding service is unreachable,
+   results fall back to keyword-only. Results are cached for 5 minutes.
+
+3. **Answer** (optional). The top 5 results are sent to a chat model of your
+   choice, which writes a short answer citing them as `[1]`, `[2]`, ….
 
 ## Configuration
 
@@ -71,12 +77,16 @@ your latest posts, and updates as you type.
 
 ## On your site
 
-- **Site search:** with **Use AI Smart Search for site search** on (**AI Smart Search →
-  Search**, on by default), your theme's search box and results page use
+Both switches are on **AI Smart Search → Search** (the page the top-level
+menu opens).
+
+- **Site search:** with **Use AI Smart Search for site search** on (on by
+  default), your theme's search box and results page use
   keyword + semantic ranking, and each result's excerpt shows the passage
   that matched. If nothing matches, WordPress's own search is used.
 - **AI answer above results:** switch on **Show an AI answer above search
-  results** to add the answer box automatically, or place it yourself:
+  results** (off by default; needs a chat model) to add the answer box
+  automatically, or place it yourself:
   - the **AI Answer** block (e.g. in a block theme's Search Results template), or
   - the `[ai_search_answer]` shortcode (classic themes, widgets).
 
@@ -139,6 +149,8 @@ count is planned.
 4. Click **Re-index all posts** on **AI Smart Search → Re-Index** to index
    existing content. After that, posts and pages are indexed automatically as
    they are saved.
+5. Optional: set up a chat model on **AI Smart Search → Chat** and switch on
+   the AI answer on **AI Smart Search → Search**.
 
 ## Indexing status
 
