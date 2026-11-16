@@ -117,9 +117,9 @@ menu opens).
   that matched. If nothing matches, WordPress's own search is used.
 - **AI answer above results:** switch on **Show an AI answer above search
   results** (off by default; needs a chat model) to add the answer box
-  automatically, or place it yourself:
-  - the **AI Answer** block (e.g. in a block theme's Search Results template), or
-  - the `[ai_search_answer]` shortcode (classic themes, widgets).
+  automatically, or place the `[ai_search_answer]` shortcode yourself
+  (classic theme templates and widgets, or a Shortcode block in a block
+  theme's Search Results template).
 
   The answer loads after the results, is labelled as AI-generated, links its
   `[1]`, `[2]` citations to the source posts and lists them below. It only

@@ -12,7 +12,7 @@ namespace WP_AI_Smart_Search;
 /**
  * Shared entry point for searching: query normalisation, caching and the
  * front-end search options. Used by the REST API, the native search
- * integration and the AI Answer block.
+ * integration and the AI answer box.
  *
  * @package WP_AI_Smart_Search
  */
@@ -61,6 +61,7 @@ final class Search_Service {
 	 */
 	public static function normalize_query( $value ): string {
 		$query = sanitize_text_field( (string) $value );
+		// Collapse every run of whitespace (/u: Unicode-aware) to one space.
 		$query = trim( (string) preg_replace( '/\s+/u', ' ', $query ) );
 
 		return mb_substr( $query, 0, self::MAX_QUERY );

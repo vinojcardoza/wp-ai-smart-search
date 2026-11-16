@@ -33,7 +33,7 @@ final class Hooks_Manager {
 		Hooks\Post_Exclusion::class,
 		Hooks\Rest_Api::class,
 		Hooks\Search_Integration::class,
-		Hooks\Answer_Block::class,
+		Hooks\Answer_Box::class,
 	);
 
 	/**

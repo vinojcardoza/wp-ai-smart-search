@@ -16,62 +16,75 @@
 	}
 
 	const statusEl = card.querySelector( '[data-wpaismse-reindex-status]' );
-	const button = card.querySelector( '[data-wpaismse-reindex-button]' );
+	const button   = card.querySelector( '[data-wpaismse-reindex-button]' );
 	const RETRY_MS = 3000;
-	const NEXT_MS = 300;
+	const NEXT_MS  = 300;
 
 	function updateStats( stats ) {
-		Object.keys( stats ).forEach( function ( key ) {
-			const el = document.querySelector( '[data-wpaismse-stat="' + key + '"]' );
-			if ( el ) {
-				el.textContent = stats[ key ];
+		Object.keys( stats ).forEach(
+			function ( key ) {
+				const el = document.querySelector( '[data-wpaismse-stat="' + key + '"]' );
+				if ( el ) {
+						el.textContent = stats[ key ];
+				}
 			}
-		} );
+		);
 	}
 
 	function finish() {
 		if ( button ) {
-			button.disabled = false;
+			button.disabled    = false;
 			button.textContent = button.dataset.idleLabel || button.textContent;
 		}
 		card.dataset.status = 'done';
 	}
 
 	function step() {
-		const body = new URLSearchParams( {
-			action: 'wpaismse_reindex_step',
-			nonce: card.dataset.nonce,
-		} );
+		const body = new URLSearchParams(
+			{
+				action: 'wpaismse_reindex_step',
+				nonce: card.dataset.nonce,
+			}
+		);
 
-		fetch( card.dataset.ajaxUrl, {
-			method: 'POST',
-			credentials: 'same-origin',
-			body: body,
-		} )
-			.then( function ( response ) {
-				if ( ! response.ok ) {
-					throw new Error( 'HTTP ' + response.status );
+		fetch(
+			card.dataset.ajaxUrl,
+			{
+				method: 'POST',
+				credentials: 'same-origin',
+				body: body,
+			}
+		)
+			.then(
+				function ( response ) {
+					if ( ! response.ok ) {
+							throw new Error( 'HTTP ' + response.status );
+					}
+					return response.json();
 				}
-				return response.json();
-			} )
-			.then( function ( result ) {
-				if ( ! result || ! result.success ) {
-					throw new Error( 'Request failed' );
-				}
+			)
+			.then(
+				function ( result ) {
+					if ( ! result || ! result.success ) {
+							throw new Error( 'Request failed' );
+					}
 
-				statusEl.innerHTML = result.data.html;
-				updateStats( result.data.stats );
+					statusEl.innerHTML = result.data.html;
+					updateStats( result.data.stats );
 
-				if ( result.data.status === 'running' ) {
-					window.setTimeout( step, NEXT_MS );
-				} else {
-					finish();
+					if ( result.data.status === 'running' ) {
+						window.setTimeout( step, NEXT_MS );
+					} else {
+						finish();
+					}
 				}
-			} )
-			.catch( function () {
-				// Network hiccup or another request holding the lock: try again shortly.
-				window.setTimeout( step, RETRY_MS );
-			} );
+			)
+			.catch(
+				function () {
+					// Network hiccup or another request holding the lock: try again shortly.
+					window.setTimeout( step, RETRY_MS );
+				}
+			);
 	}
 
 	step();
@@ -85,7 +98,7 @@
 	'use strict';
 
 	const textarea = document.querySelector( '[data-wpaismse-prompt]' );
-	const preview = document.querySelector( '[data-wpaismse-prompt-preview]' );
+	const preview  = document.querySelector( '[data-wpaismse-prompt-preview]' );
 
 	if ( ! textarea || ! preview ) {
 		return;
@@ -104,8 +117,11 @@
 
 	// "Discard" resets the form after the event fires, so re-render afterwards.
 	if ( textarea.form ) {
-		textarea.form.addEventListener( 'reset', function () {
-			window.setTimeout( render, 0 );
-		} );
+		textarea.form.addEventListener(
+			'reset',
+			function () {
+				window.setTimeout( render, 0 );
+			}
+		);
 	}
 }() );

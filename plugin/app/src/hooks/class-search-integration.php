@@ -169,7 +169,7 @@ class Search_Integration {
 
 		$this->inserted = true;
 
-		echo Answer_Block::render( 'class="wpaismse-answer"', true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped in Answer_Block::render().
+		echo Answer_Box::render(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built and escaped in Answer_Box::render().
 	}
 
 	/**
@@ -188,7 +188,7 @@ class Search_Integration {
 
 		$this->inserted = true;
 
-		return Answer_Block::render( 'class="wpaismse-answer"', true ) . $content;
+		return Answer_Box::render() . $content;
 	}
 
 	/**

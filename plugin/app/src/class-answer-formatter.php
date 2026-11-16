@@ -64,6 +64,10 @@ final class Answer_Formatter {
 				continue;
 			}
 
+			// Line patterns, each allowing leading indent and capturing the text in group 1:
+			// - bullet:   "-", "*" or "•", then whitespace           → <ul>
+			// - numbered: digits, then "." or ")", then whitespace   → <ol>
+			// - heading:  one to six "#", then whitespace            → bold line.
 			if ( preg_match( '/^\s*[-*•]\s+(.*)$/u', $line, $match ) ) {
 				$flush_paragraph();
 				if ( $list_type !== 'ul' ) {
@@ -118,13 +122,18 @@ final class Answer_Formatter {
 	 */
 	private static function inline( string $text, array $urls ): string {
 		$text = esc_html( trim( $text ) );
+		// **bold** → <strong>. Lazy (.+?) so "**a** and **b**" makes two tags, not one.
+		// Safe after esc_html(): only the tags added here are unescaped HTML.
 		$text = (string) preg_replace( '/\*\*(.+?)\*\*/u', '<strong>$1</strong>', $text );
+		// `code` → <code>: a backtick, one or more non-backtick characters, a backtick.
 		$text = (string) preg_replace( '/`([^`]+)`/u', '<code>$1</code>', $text );
 
 		// [1] or [1, 2]: link each number that matches a source; leave others as text.
+		// Group 1 is the inside: a number, then any ", n" repeats (?: … non-capturing).
 		return (string) preg_replace_callback(
 			'/\[(\d+(?:\s*,\s*\d+)*)\]/',
 			function ( array $citation ) use ( $urls ): string {
+				// Split "1, 2" on commas, swallowing the spaces around them.
 				$numbers = array_map( 'intval', preg_split( '/\s*,\s*/', $citation[1] ) );
 				$links   = array_map(
 					fn( int $n ): string => isset( $urls[ $n ] )

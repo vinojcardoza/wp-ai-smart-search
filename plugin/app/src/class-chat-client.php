@@ -159,6 +159,10 @@ class Chat_Client {
 	 */
 	public static function clean( string $content ): string {
 		// Complete <think>…</think> blocks, then an unclosed one at the start.
+		// # delimiters avoid escaping the "/" in </think>. s: "." also matches
+		// newlines; i: case-insensitive; .*? (lazy) stops at the first </think>.
+		// The second pattern drops everything from a leading <think> to the end
+		// (the model was cut off mid-thought).
 		$content = (string) preg_replace( '#<think>.*?</think>#si', '', $content );
 		$content = (string) preg_replace( '#^\s*<think>.*#si', '', $content );
 

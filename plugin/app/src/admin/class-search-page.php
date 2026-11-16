@@ -102,7 +102,7 @@ class Search_Page {
 							Search_Service::AUTO_ANSWER_OPTION,
 							__( 'Show an AI answer above search results', 'wpaismse' ),
 							Chat::is_configured()
-								? __( 'Adds the AI Answer box automatically. Turn this off if you place the AI Answer block or [ai_search_answer] shortcode yourself.', 'wpaismse' )
+								? __( 'Adds the AI Answer box automatically. Turn this off if you place the [ai_search_answer] shortcode yourself.', 'wpaismse' )
 								: __( 'Needs a chat model: set it up on the Chat page first.', 'wpaismse' ),
 							Search_Service::auto_answer()
 						);
@@ -134,10 +134,9 @@ class Search_Page {
 
 				<section class="wpaismse-card wpaismse-card--aside">
 					<h2 class="wpaismse-card__title"><?php esc_html_e( 'Place it yourself', 'wpaismse' ); ?></h2>
-					<p class="wpaismse-note"><?php esc_html_e( 'Instead of the automatic answer box, add one of these where you want the answer to appear on search results:', 'wpaismse' ); ?></p>
-					<p class="wpaismse-note"><strong><?php esc_html_e( 'AI Answer block', 'wpaismse' ); ?></strong> — <?php esc_html_e( 'e.g. in a block theme\'s Search Results template.', 'wpaismse' ); ?></p>
+					<p class="wpaismse-note"><?php esc_html_e( 'Instead of the automatic answer box, add this shortcode where you want the answer to appear on search results:', 'wpaismse' ); ?></p>
 					<pre class="wpaismse-code">[ai_search_answer]</pre>
-					<p class="wpaismse-note"><?php esc_html_e( 'Shortcode for classic themes and widgets.', 'wpaismse' ); ?></p>
+					<p class="wpaismse-note"><?php esc_html_e( 'Works in classic theme templates and widgets, and in a Shortcode block in a block theme\'s Search Results template.', 'wpaismse' ); ?></p>
 				</section>
 			</aside>
 		</div>

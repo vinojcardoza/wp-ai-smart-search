@@ -65,6 +65,9 @@ final class Chunker {
 			throw new InvalidArgumentException( 'Chunk overlap must be at least 0 and less than the chunk size.' );
 		}
 
+		// Split on runs of whitespace, including Unicode separators (\p{Z}, e.g.
+		// no-break space). /u reads the text as UTF-8; PREG_SPLIT_NO_EMPTY drops
+		// the empty strings leading/trailing whitespace would produce.
 		$words = preg_split( '/[\s\p{Z}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY );
 
 		if ( $words === false ) {

@@ -95,11 +95,13 @@ class Chat_Page {
 		$url = esc_url_raw( $value, array( 'http', 'https' ) );
 
 		if ( $url === '' ) {
-			function_exists( 'add_settings_error' ) && add_settings_error(
-				Chat::ENDPOINT_OPTION,
-				'invalid_chat_endpoint',
-				__( 'The chat endpoint must be a valid http or https URL.', 'wpaismse' )
-			);
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					Chat::ENDPOINT_OPTION,
+					'invalid_chat_endpoint',
+					__( 'The chat endpoint must be a valid http or https URL.', 'wpaismse' )
+				);
+			}
 
 			return (string) get_option( Chat::ENDPOINT_OPTION, '' );
 		}
@@ -123,6 +125,10 @@ class Chat_Page {
 	 */
 	public function sanitize_prompt( $value ): string {
 		$prompt = str_replace( array( "\r\n", "\r" ), "\n", wp_check_invalid_utf8( (string) $value ) );
+		// Remove Unicode "Other" characters (\p{C}: control, format, private-use,
+		// unassigned) except newlines and tabs. [^\P{C}\n\t] = "in C, and not \n
+		// or \t". The /u flag makes it match by code point, not byte. preg_replace()
+		// returns null on failure, hence the (string) cast.
 		$prompt = trim( (string) preg_replace( '/[^\P{C}\n\t]/u', '', $prompt ) );
 
 		if ( Chat::DEFAULT_PROMPT === $prompt ) {

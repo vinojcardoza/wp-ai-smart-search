@@ -1,5 +1,5 @@
 /**
- * AI Answer block — front end.
+ * AI answer box — front end ([ai_search_answer] and search results auto-insert).
  *
  * Inherits the theme's fonts and colours; only spacing, a subtle frame and
  * the loading indicator are set here.
@@ -13,7 +13,8 @@
 	background: rgba(127, 127, 127, 0.06);
 }
 
-.wpaismse-answer[hidden] {
+.wpaismse-answer[hidden],
+.wpaismse-answer [hidden] {
 	display: none;
 }
 
@@ -92,7 +93,7 @@
 	font-weight: 600;
 }
 
-.wpaismse-answer__sources {
+.wpaismse-answer__sources ol {
 	margin: 0;
 	padding-left: 1.4em;
 	font-size: 0.9em;
@@ -101,8 +102,4 @@
 .wpaismse-answer__message {
 	margin: 0;
 	opacity: 0.8;
-}
-
-.wpaismse-answer--placeholder {
-	opacity: 0.85;
 }
